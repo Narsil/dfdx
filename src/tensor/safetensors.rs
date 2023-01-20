@@ -1,6 +1,6 @@
 use super::{CopySlice, DeviceStorage, Tensor};
 use crate::{
-    shapes::{Dtype, HasShape, Shape},
+    shapes::{Dtype, HasShape, HasUnitType, Shape},
     tensor::AsVec,
 };
 use no_std_compat::{collections::BTreeMap, path::Path, string::String, vec::Vec};
@@ -14,6 +14,7 @@ struct TensorData {
     data: Vec<u8>,
 }
 
+#[derive(Default)]
 pub struct Writer {
     tensors: BTreeMap<String, TensorData>,
 }
@@ -24,10 +25,14 @@ impl Writer {
         Self { tensors }
     }
 
-    pub fn add<S, T, E: Dtype + SafeDtype>(mut self, key: String, tensor: Tensor<S, E>) -> Self
+    pub fn add<S, T, E: Dtype + SafeDtype, D: DeviceStorage + CopySlice<E>>(
+        mut self,
+        key: String,
+        tensor: Tensor<S, E, D, T>,
+    ) -> Self
     where
-        T: Into<Vec<usize>>,
-        S: Shape<Concrete = T>,
+        S: Shape,
+        <D as DeviceStorage>::Storage<S, E>: HasUnitType<Unit = E> + AsVec,
     {
         let dtype = E::safe_dtype();
         let shape = tensor.shape().concrete().into();
@@ -123,7 +128,7 @@ impl<S: Shape, E: Dtype + SafeDtype, D: DeviceStorage + CopySlice<E>, T> Tensor<
             // was correctly aligned.
             let data: &[E] =
                 unsafe { std::slice::from_raw_parts(v.as_ptr() as *const E, v.len() / num_bytes) };
-            self.copy_from(&data);
+            self.copy_from(data);
         } else {
             let mut c = Vec::with_capacity(v.len() / num_bytes);
             let mut i = 0;
