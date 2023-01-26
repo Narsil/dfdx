@@ -30,3 +30,14 @@ impl_for!([S], (S));
 impl_for!([S, T], (S * T));
 impl_for!([S, T, U], (S * T * U));
 impl_for!([S, T, U, V], (S * T * U * V));
+
+// TODO
+impl<const M: usize, const N: usize, const O: usize> HasSameNumelAs<(usize, Const<M>)>
+    for (usize, Const<N>, Const<O>)
+{
+}
+
+impl<const N: usize, const O: usize> HasSameNumelAs<(usize, Const<N>, Const<O>)>
+    for (usize, Const<N>, Const<O>)
+{
+}

@@ -119,6 +119,9 @@ pub(crate) mod cuda;
 #[cfg(feature = "numpy")]
 pub(crate) mod numpy;
 
+#[cfg(feature = "safetensors")]
+pub mod safetensors;
+
 pub(crate) mod storage_traits;
 
 pub(crate) use storage_traits::{OneFillStorage, ZeroFillStorage};

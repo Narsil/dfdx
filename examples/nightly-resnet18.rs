@@ -1,7 +1,5 @@
 #![cfg_attr(feature = "nightly", feature(generic_const_exprs))]
 
-const PROBES: u32 = 10;
-
 #[cfg(feature = "nightly")]
 fn main() {
     use dfdx::prelude::*;

@@ -1,4 +1,4 @@
-use crate::shapes::{Dtype, Shape};
+use crate::shapes::{Dtype, Dyn, Shape};
 use crate::tensor::cpu::*;
 use crate::tensor_ops::matmul::cpu_kernel::MatMulImpl;
 
@@ -74,9 +74,9 @@ impl Cpu {
         }
 
         // (O, C * K * K) * (C * K * K, OH * OW) = (O, OH * OW)
-        let m = op.chan_out;
-        let k = op.chan_in * op.kernel * op.kernel;
-        let n = op.w_out * op.h_out;
+        let m = Dyn::<'O'>(op.chan_out);
+        let k = Dyn::<'A'>(op.chan_in * op.kernel * op.kernel);
+        let n = Dyn::<'B'>(op.w_out * op.h_out);
         Self::matmul(
             View::new(filters, (m, k)),
             View::new(inp_patches_buf.view().data, (k, n)),
@@ -123,9 +123,9 @@ impl Cpu {
         {
             // img_g += filters^T * unfold(grad_out)
             // (C, H * W) += (C, O * K * K) * (O * K * K, H * W)
-            let m = op.chan_in;
-            let k = op.chan_out * op.kernel * op.kernel;
-            let n = op.h_in * op.w_in;
+            let m = Dyn::<'I'>(op.chan_in);
+            let k = Dyn::<'A'>(op.chan_out * op.kernel * op.kernel);
+            let n = Dyn::<'B'>(op.w_in * op.h_in);
             Self::matmul(
                 View::new(filters_tr, (m, k)),
                 View::new(out_patches_buf.view().data, (k, n)),
@@ -136,9 +136,9 @@ impl Cpu {
         {
             // weight_g^T += img * patches^T
             // (C, O * K * K) += (C, H * W) * (H * W, O * K * K)
-            let m = op.chan_in;
-            let k = op.h_in * op.w_in;
-            let n = op.chan_out * op.kernel * op.kernel;
+            let m = Dyn::<'I'>(op.chan_in);
+            let k = Dyn::<'A'>(op.h_in * op.w_in);
+            let n = Dyn::<'B'>(op.chan_out * op.kernel * op.kernel);
             Self::matmul(
                 View::new(img, (m, k)),
                 View::new(out_patches_buf.view().data, (n, k)).tr(),
@@ -160,7 +160,14 @@ where
         rhs: &Self::Storage<R, E>,
         out: &mut Self::Storage<O, E>,
     ) -> Result<(), Self::Err> {
-        let mut patches: StridedArray<_, E> = StridedArray::new(op.inp_patches_shape())?;
+        let in_shape = (
+            Dyn::<'I'>(op.chan_in),
+            Dyn::<'K'>(op.kernel),
+            Dyn::<'K'>(op.kernel),
+            Dyn::<'H'>(op.h_out),
+            Dyn::<'W'>(op.w_out),
+        );
+        let mut patches: StridedArray<_, E> = StridedArray::new(in_shape)?;
         let [lstride, ostride] = match L::NUM_DIMS {
             3 => [0; 2],
             4 => [lhs.strides[0], out.strides[0]],
@@ -190,9 +197,23 @@ where
         grad_rhs: &mut Self::Storage<R, E>,
         grad_out: &Self::Storage<O, E>,
     ) -> Result<(), Self::Err> {
-        let mut patches: StridedArray<_, E> = StridedArray::new(op.out_patches_shape())?;
-        let mut f1023: StridedArray<_, E> = StridedArray::new(op.filters_tr_shape())?;
-        let mut grad_f1023: StridedArray<_, E> = StridedArray::new(op.filters_tr_shape())?;
+        let out_shape = (
+            Dyn::<'O'>(op.chan_out),
+            Dyn::<'K'>(op.kernel),
+            Dyn::<'K'>(op.kernel),
+            Dyn::<'h'>(op.h_in),
+            Dyn::<'w'>(op.w_in),
+        );
+        let mut patches: StridedArray<_, E> = StridedArray::new(out_shape)?;
+
+        let filter_shape = (
+            Dyn::<'I'>(op.chan_in),
+            Dyn::<'O'>(op.chan_out),
+            Dyn::<'K'>(op.kernel),
+            Dyn::<'K'>(op.kernel),
+        );
+        let mut f1023: StridedArray<_, E> = StridedArray::new(filter_shape)?;
+        let mut grad_f1023: StridedArray<_, E> = StridedArray::new(filter_shape)?;
 
         {
             // transpose filters in f1023

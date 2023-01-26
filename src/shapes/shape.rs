@@ -91,6 +91,22 @@ impl Dim for usize {
 
 /// Represents a [Dim] with size known at compile time
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub struct Dyn<const M: char>(pub usize);
+
+impl<const M: char> Dim for Dyn<M> {
+    #[inline(always)]
+    fn size(&self) -> usize {
+        self.0
+    }
+
+    #[inline(always)]
+    fn from_size(size: usize) -> Option<Self> {
+        Some(Dyn(size))
+    }
+}
+
+/// Represents a [Dim] with size known at compile time
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub struct Const<const M: usize>;
 impl<const M: usize> Dim for Const<M> {
     #[inline(always)]

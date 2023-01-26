@@ -126,6 +126,7 @@ mod repeated;
 mod residual;
 mod split_into;
 mod transformer;
+mod unbiased_linear;
 
 pub use module::*;
 
@@ -156,6 +157,7 @@ pub mod modules {
     pub use super::split_into::SplitInto;
     #[cfg(feature = "nightly")]
     pub use super::transformer::*;
+    pub use super::unbiased_linear::UnbiasedLinear;
 }
 
 pub mod builders {
@@ -181,6 +183,7 @@ pub mod builders {
     pub use super::split_into::SplitInto;
     #[cfg(feature = "nightly")]
     pub use super::transformer::builder::*;
+    pub use super::unbiased_linear::builder::UnbiasedLinear;
 }
 
 #[cfg(test)]

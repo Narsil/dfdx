@@ -231,14 +231,53 @@ where
     }
 }
 
+// impl super::MatMatBatch3Kernel<f32> for Cpu {
+//     fn forward<const B: usize, M: Dim, const K: usize, N: Dim>(
+//         &self,
+//         lhs: &Self::Storage<(Const<B>, M, Const<K>), f32>,
+//         rhs: &Self::Storage<(Const<B>, Const<K>, N), f32>,
+//     ) -> Result<Self::Storage<(Const<B>, M, N), f32>, Self::Err> {
+//         let m: M = lhs.shape().1;
+//         let n: N = rhs.shape().2;
+//         let mut out = StridedArray::new((Const, m, n))?;
+//         let a = lhs.view();
+//         let b = rhs.view();
+//         let mut c = out.view_mut();
+//         for batch in 0..B {
+//             matmul(a.idx(batch), b.idx(batch), &mut c.idx_mut(batch));
+//         }
+//         Ok(out)
+//     }
+//     fn backward<const B: usize, M: Dim, const K: usize, N: Dim>(
+//         &self,
+//         lhs: &Self::Storage<(Const<B>, M, Const<K>), f32>,
+//         grad_lhs: &mut Self::Storage<(Const<B>, M, Const<K>), f32>,
+//         rhs: &Self::Storage<(Const<B>, Const<K>, N), f32>,
+//         grad_rhs: &mut Self::Storage<(Const<B>, Const<K>, N), f32>,
+//         grad_out: &Self::Storage<(Const<B>, M, N), f32>,
+//     ) -> Result<(), Self::Err> {
+//         let lhs = lhs.view();
+//         let mut grad_lhs = grad_lhs.view_mut();
+//         let rhs = rhs.view();
+//         let mut grad_rhs = grad_rhs.view_mut();
+//         let grad_out = grad_out.view();
+//         for b in 0..B {
+//             let go = grad_out.idx(b);
+//             matmul(go, rhs.idx(b).tr(), &mut grad_lhs.idx_mut(b));
+//             matmul(lhs.idx(b).tr(), go, &mut grad_rhs.idx_mut(b));
+//         }
+//         Ok(())
+//     }
+// }
+
 impl<F: Dtype> super::MatMatBatch3Kernel<F> for Cpu
 where
     Self: MatMulImpl<F>,
 {
-    fn forward<const B: usize, M: Dim, const K: usize, N: Dim>(
+    fn forward<const B: usize, M: Dim, K: Dim, N: Dim>(
         &self,
-        lhs: &Self::Storage<(Const<B>, M, Const<K>), F>,
-        rhs: &Self::Storage<(Const<B>, Const<K>, N), F>,
+        lhs: &Self::Storage<(Const<B>, M, K), F>,
+        rhs: &Self::Storage<(Const<B>, K, N), F>,
     ) -> Result<Self::Storage<(Const<B>, M, N), F>, Self::Err> {
         let m: M = lhs.shape().1;
         let n: N = rhs.shape().2;
@@ -251,12 +290,12 @@ where
         }
         Ok(out)
     }
-    fn backward<const B: usize, M: Dim, const K: usize, N: Dim>(
+    fn backward<const B: usize, M: Dim, K: Dim, N: Dim>(
         &self,
-        lhs: &Self::Storage<(Const<B>, M, Const<K>), F>,
-        grad_lhs: &mut Self::Storage<(Const<B>, M, Const<K>), F>,
-        rhs: &Self::Storage<(Const<B>, Const<K>, N), F>,
-        grad_rhs: &mut Self::Storage<(Const<B>, Const<K>, N), F>,
+        lhs: &Self::Storage<(Const<B>, M, K), F>,
+        grad_lhs: &mut Self::Storage<(Const<B>, M, K), F>,
+        rhs: &Self::Storage<(Const<B>, K, N), F>,
+        grad_rhs: &mut Self::Storage<(Const<B>, K, N), F>,
         grad_out: &Self::Storage<(Const<B>, M, N), F>,
     ) -> Result<(), Self::Err> {
         let lhs = lhs.view();

@@ -52,11 +52,11 @@ pub struct Embedding<const VOCAB: usize, const DIM: usize, E: Dtype, D: DeviceSt
     pub weight: Tensor<Rank2<VOCAB, DIM>, E, D>,
 }
 
-impl<const V: usize, const M: usize, const S: usize, E: Dtype, D: Device<E>, T: Tape<D>>
-    Module<Tensor<Rank1<S>, usize, D, T>> for Embedding<V, M, E, D>
+impl<const VOCAB: usize, const DIM: usize, E: Dtype, D: Device<E>, T: Tape<D>, Seq: Dim>
+    Module<Tensor<(Seq,), usize, D, T>> for Embedding<VOCAB, DIM, E, D>
 {
-    type Output = Tensor<Rank2<S, M>, E, D, T>;
-    fn forward(&self, input: Tensor<Rank1<S>, usize, D, T>) -> Self::Output {
+    type Output = Tensor<(Seq, Const<DIM>), E, D, T>;
+    fn forward(&self, input: Tensor<(Seq,), usize, D, T>) -> Self::Output {
         let (input, tape) = input.split_tape();
         self.weight.clone().put_tape(tape).gather(input)
     }

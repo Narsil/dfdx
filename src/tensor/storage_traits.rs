@@ -113,7 +113,7 @@ pub trait ZerosTensor<E: Unit>: DeviceStorage {
     /// ```rust
     /// # use dfdx::prelude::*;
     /// # let dev: Cpu = Default::default();
-    /// let a: Tensor<(usize, Const<3>), f32, _> = dev.zeros_like(&(5, Const));
+    /// let a: Tensor<(Dyn<'B'>, Const<3>), f32, _> = dev.zeros_like(&(Dyn::<'B'>(5), Const));
     /// ```
     ///
     /// Given another tensor:
@@ -161,7 +161,7 @@ pub trait OnesTensor<E: Unit>: DeviceStorage {
     /// ```rust
     /// # use dfdx::prelude::*;
     /// # let dev: Cpu = Default::default();
-    /// let a: Tensor<(usize, Const<3>), f32, _> = dev.ones_like(&(5, Const));
+    /// let a: Tensor<(Dyn<'B'>, Const<3>), f32, _> = dev.ones_like(&(Dyn::<'B'>(5), Const));
     /// ```
     ///
     /// Given another tensor:
