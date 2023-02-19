@@ -48,6 +48,12 @@ impl<S: Shape, E: Unit, D: DeviceStorage, T> HasShape for Tensor<S, E, D, T> {
     }
 }
 
+impl<S: Shape, E: Unit, D: DeviceStorage, T> Tensor<S, E, D, T> {
+    pub fn device(&self) -> &D {
+        &self.device
+    }
+}
+
 impl<S: Shape, E: Unit, D: DeviceStorage, T> HasUnitType for Tensor<S, E, D, T> {
     type Unit = E;
 }
