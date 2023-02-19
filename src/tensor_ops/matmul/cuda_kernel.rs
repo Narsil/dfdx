@@ -475,7 +475,10 @@ where
     }
 }
 
-impl<E: Dtype> super::MatMatBatch3Kernel<E> for Cuda {
+impl<E: Dtype> super::MatMatBatch3Kernel<E> for Cuda
+where
+    CudaBlas: Gemm<E>,
+{
     fn forward<const B: usize, M: Dim, K: Dim, N: Dim>(
         &self,
         lhs: &Self::Storage<(Const<B>, M, K), E>,
