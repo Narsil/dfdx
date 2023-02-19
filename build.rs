@@ -19,6 +19,17 @@ fn main() {
 mod cuda {
     pub fn build_ptx() {
         let out_dir = std::env::var("OUT_DIR").unwrap();
+        let compute_sm = std::env::var("COMPUTE_SM").unwrap_or_else(|_| {
+            let output = std::process::Command::new("nvidia-smi")
+                .args(["--query-gpu", "compute_cap"])
+                .args(["--format", "csv"])
+                .output()
+                .unwrap()
+                .stdout;
+            let output = String::from_utf8(output).unwrap();
+            let tokens: Vec<&str> = output.split('\n').collect();
+            format!("compute_{}", tokens[1].replace('.', ""))
+        });
         let mut kernel_paths: Vec<std::path::PathBuf> = glob::glob("src/**/*.cu")
             .unwrap()
             .map(|p| p.unwrap())
@@ -58,7 +69,7 @@ mod cuda {
             println!("cargo:rerun-if-changed={}", kernel_path.display());
 
             let output = std::process::Command::new("nvcc")
-                .args(["--gpu-architecture", "compute_60"])
+                .args(["--gpu-architecture", &compute_sm])
                 .arg("--ptx")
                 .args(["--output-directory", &out_dir])
                 .args(&include_options)
