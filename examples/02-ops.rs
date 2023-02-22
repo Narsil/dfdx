@@ -4,6 +4,7 @@ use dfdx::{
     shapes::{Rank0, Rank1, Rank2},
     tensor::{AsArray, Cpu, SampleTensor, Tensor},
     tensor_ops::{MeanTo, TryMatMul},
+    nn::ToDevice,
 };
 
 #[cfg(not(feature = "cuda"))]

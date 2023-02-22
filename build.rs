@@ -47,6 +47,7 @@ mod cuda {
         include_directories.sort();
         include_directories.dedup();
 
+        kernel_paths.sort();
         println!("cargo:warning=Found kernels {kernel_paths:?}");
         println!("cargo:warning=Found include directories {include_directories:?}");
 

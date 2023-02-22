@@ -93,6 +93,34 @@ impl Dim for usize {
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub struct Dyn<const M: char>(pub usize);
 
+impl<const M: char> From<usize> for Dyn<M>{
+    fn from(a: usize) -> Self{
+        Self(a)
+    }
+}
+
+impl<const M: char, const N: char> From<&Dyn<N>> for Dyn<M>{
+    fn from(a: &Dyn<N>) -> Self{
+        Self(a.size())
+    }
+}
+
+#[derive(Debug)]
+pub struct ShapeError{}
+
+impl<const M: usize> TryFrom<usize> for Const<M>{
+    type Error = ShapeError;
+    fn try_from(a: usize) -> Result<Self, Self::Error>{
+
+        if a == M{
+            Ok(Self{})
+        }else{
+            Err(ShapeError{})
+        }
+
+    }
+}
+
 impl<const M: char> Dim for Dyn<M> {
     #[inline(always)]
     fn size(&self) -> usize {
