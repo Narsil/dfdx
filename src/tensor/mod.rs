@@ -126,6 +126,8 @@ pub(crate) mod storage_traits;
 
 pub(crate) use storage_traits::{OneFillStorage, ZeroFillStorage};
 
+pub use storage_traits::TensorFromVec;
+
 pub use cpu::{Cpu, CpuError};
 
 #[cfg(feature = "cuda")]
