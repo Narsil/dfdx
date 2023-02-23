@@ -163,6 +163,20 @@ impl<const M: usize> core::ops::Add<usize> for Const<M> {
     }
 }
 
+impl<const A: char> core::ops::Add<Dyn<A>> for usize {
+    type Output = usize;
+    fn add(self, rhs: Dyn<A>) -> Self::Output {
+        self + rhs.size()
+    }
+}
+
+impl<const A: char> core::ops::Add<usize> for Dyn<A> {
+    type Output = usize;
+    fn add(self, rhs: usize) -> Self::Output {
+        self.size() + rhs
+    }
+}
+
 #[cfg(feature="nightly")]
 impl<const N: usize, const M: usize> core::ops::Add<Const<N>> for Const<M>
 where
