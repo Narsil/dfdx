@@ -1,12 +1,10 @@
 use super::{CopySlice, DeviceStorage, Tensor};
-use crate::{
-    shapes::{Dtype, HasShape, HasUnitType, Shape},
-    tensor::AsVec,
-};
-use no_std_compat::{collections::BTreeMap, path::Path, string::String, vec::Vec};
+use crate::shapes::{Dtype, HasShape, Shape};
+use crate::tensor::AsVec;
 use safetensors::tensor::{
     serialize_to_file, Dtype as SDtype, SafeTensorError, SafeTensors, TensorView,
 };
+use std::{collections::HashMap, path::Path, string::String, vec::Vec};
 
 struct TensorData {
     dtype: SDtype,
@@ -15,24 +13,23 @@ struct TensorData {
 }
 
 #[derive(Default)]
-pub struct Writer {
-    tensors: BTreeMap<String, TensorData>,
+pub struct SafeWriter {
+    tensors: HashMap<String, TensorData>,
 }
 
-impl Writer {
+impl SafeWriter {
     pub fn new() -> Self {
-        let tensors = BTreeMap::new();
+        let tensors = HashMap::new();
         Self { tensors }
     }
 
     pub fn add<S, T, E: Dtype + SafeDtype, D: DeviceStorage + CopySlice<E>>(
-        mut self,
+        &mut self,
         key: String,
-        tensor: Tensor<S, E, D, T>,
-    ) -> Self
-    where
+        tensor: &Tensor<S, E, D, T>,
+    ) where
         S: Shape,
-        <D as DeviceStorage>::Storage<S, E>: HasUnitType<Unit = E> + AsVec,
+        <D as DeviceStorage>::Storage<S, E>: AsVec<E>,
     {
         let dtype = E::safe_dtype();
         let shape = tensor.shape().concrete().into();
@@ -40,20 +37,22 @@ impl Writer {
         let data: Vec<u8> = data.iter().flat_map(|f| f.to_le_bytes()).collect();
         let tdata = TensorData { dtype, shape, data };
         self.tensors.insert(key, tdata);
-        self
     }
 
-    pub fn save(&self, path: &Path) -> Result<(), SafeTensorError> {
-        let views: BTreeMap<String, TensorView> = self
+    pub fn save_safetensors(&self, path: &Path) -> Result<(), SafeTensorError> {
+        let views: Result<HashMap<String, TensorView>, _> = self
             .tensors
             .iter()
-            .map(|(k, tensor)| {
-                (
-                    k.clone(),
-                    TensorView::new(tensor.dtype, tensor.shape.clone(), &tensor.data),
-                )
-            })
+            .map(
+                |(k, tensor)| -> Result<(String, TensorView), SafeTensorError> {
+                    Ok((
+                        k.clone(),
+                        TensorView::new(tensor.dtype, tensor.shape.clone(), &tensor.data)?,
+                    ))
+                },
+            )
             .collect();
+        let views = views?;
         serialize_to_file(&views, &None, path)
     }
 }
@@ -111,11 +110,11 @@ impl SafeDtype for f64 {
 }
 
 impl<S: Shape, E: Dtype + SafeDtype, D: DeviceStorage + CopySlice<E>, T> Tensor<S, E, D, T> {
-    pub fn safetensors_writer() -> Writer {
-        Writer::new()
+    pub fn safetensors_writer() -> SafeWriter {
+        SafeWriter::new()
     }
 
-    pub fn load<'a>(
+    pub fn load_safetensors<'a>(
         &mut self,
         tensors: &SafeTensors<'a>,
         key: &str,

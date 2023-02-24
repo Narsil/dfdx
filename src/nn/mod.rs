@@ -127,11 +127,15 @@ mod pool2d;
 mod pool_global;
 mod repeated;
 mod residual;
+#[cfg(feature = "safetensors")]
+mod safetensors;
 mod split_into;
 mod transformer;
 
 pub use module::*;
 
+#[cfg(feature = "safetensors")]
+pub use crate::nn::safetensors::{LoadFromSafeTensors, SaveToSafeTensors};
 #[cfg(feature = "numpy")]
 pub use npz::{LoadFromNpz, SaveToNpz};
 pub use num_params::NumParams;
