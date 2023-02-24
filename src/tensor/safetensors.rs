@@ -125,6 +125,7 @@ impl<S: Shape, E: Dtype + SafeDtype, D: DeviceStorage + CopySlice<E>, T> Tensor<
         if (v.as_ptr() as usize) % num_bytes == 0 {
             // SAFETY This is safe because we just checked that this
             // was correctly aligned.
+            // TODO use `is_aligned` when stabilized.
             let data: &[E] =
                 unsafe { std::slice::from_raw_parts(v.as_ptr() as *const E, v.len() / num_bytes) };
             self.copy_from(data);
