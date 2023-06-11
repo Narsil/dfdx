@@ -5,9 +5,11 @@ struct ScalarDivKernelOp {
     T scalar;
 };
 
+#if __CUDA_ARCH__ >= 530
 UNARY_OP(__half, sdiv_fwd_f16, sdiv_bwd_f16, ScalarDivKernelOp<__half>,
     x / op.scalar,
     recipg(op.scalar));
+#endif
 
 UNARY_OP(float, sdiv_fwd_f32, sdiv_bwd_f32, ScalarDivKernelOp<float>,
     x / op.scalar,

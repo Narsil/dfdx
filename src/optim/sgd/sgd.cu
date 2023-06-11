@@ -71,6 +71,8 @@ extern "C" __global__ void FN( \
     sgd_update(cfg, numel, param, velocity, grad); \
 }
 
+#if __CUDA_ARCH__ >= 530
 SGD(__half, sgd_update_f16);
+#endif
 SGD(float, sgd_update_f32);
 SGD(double, sgd_update_f64);

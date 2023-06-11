@@ -15,9 +15,11 @@ __device__ __forceinline__ T relu_bwd(T x) {
     return x > zero ? one : zero;
 }
 
+#if __CUDA_ARCH__ >= 530
 UNARY_OP(__half, relu_fwd_f16, relu_bwd_f16, ReLUKernelOp,
         relu_fwd(x),
         relu_bwd(x))
+#endif
 
 UNARY_OP(float, relu_fwd_f32, relu_bwd_f32, ReLUKernelOp,
         relu_fwd(x),

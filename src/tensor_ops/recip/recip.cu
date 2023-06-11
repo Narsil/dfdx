@@ -2,11 +2,13 @@
 
 struct RecipKernelOp {};
 
+#if __CUDA_ARCH__ >= 530
 UNARY_OP(
     __half, recip_fwd_f16, recip_bwd_f16, RecipKernelOp,
     recipg(x),
     -y * y
 )
+#endif
 
 UNARY_OP(
     float, recip_fwd_f32, recip_bwd_f32, RecipKernelOp,

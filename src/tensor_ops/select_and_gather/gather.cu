@@ -118,6 +118,8 @@ extern "C" __global__ void BWD( \
     gather_bwd(numel, grad_inp, inp_num_dims, inp_dims, inp_strides, idx, idx_num_dims, idx_dims, idx_strides, grad_out, out_num_dims); \
 }
 
+#if __CUDA_ARCH__ >= 530
 GATHER(__half, gather_fwd_f16, gather_bwd_f16);
+#endif
 GATHER(float, gather_fwd_f32, gather_bwd_f32);
 GATHER(double, gather_fwd_f64, gather_bwd_f64);

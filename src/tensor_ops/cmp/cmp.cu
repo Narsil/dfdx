@@ -37,12 +37,14 @@ extern "C" __global__ void SCALAR_FWD( \
     } \
 }
 
+#if __CUDA_ARCH__ >= 530
 CMP_OP(__half, eq_fwd_f16, scalar_eq_fwd_f16, ==)
 CMP_OP(__half, ne_fwd_f16, scalar_ne_fwd_f16, !=)
 CMP_OP(__half, gt_fwd_f16, scalar_gt_fwd_f16, >)
 CMP_OP(__half, ge_fwd_f16, scalar_ge_fwd_f16, >=)
 CMP_OP(__half, lt_fwd_f16, scalar_lt_fwd_f16, <)
 CMP_OP(__half, le_fwd_f16, scalar_le_fwd_f16, <=)
+#endif
 
 CMP_OP(float, eq_fwd_f32, scalar_eq_fwd_f32, ==)
 CMP_OP(float, ne_fwd_f32, scalar_ne_fwd_f32, !=)

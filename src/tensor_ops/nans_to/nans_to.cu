@@ -5,9 +5,11 @@ struct NansToKernelOp {
     F x;
 };
 
+#if __CUDA_ARCH__ >= 530
 UNARY_OP(__half, nans_to_fwd_f16, nans_to_bwd_f16, NansToKernelOp<__half>,
     isnang(x) ? op.x : x,
     isnang(x) ? 0.0 : 1.0)
+#endif
 
 UNARY_OP(float, nans_to_fwd_f32, nans_to_bwd_f32, NansToKernelOp<float>,
     isnang(x) ? op.x : x,

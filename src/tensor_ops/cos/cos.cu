@@ -2,9 +2,11 @@
 
 struct CosKernelOp {};
 
+#if __CUDA_ARCH__ >= 530
 UNARY_OP(__half, cos_fwd_f16, cos_bwd_f16, CosKernelOp,
         cosg(x),
         -sing(x))
+#endif
 
 UNARY_OP(float, cos_fwd_f32, cos_bwd_f32, CosKernelOp,
         cosg(x),

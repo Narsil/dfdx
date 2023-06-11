@@ -11,9 +11,11 @@ __device__ T pow_bwd(PowFKernelOp<T> op, T x) {
     return op.rhs * powg(x, op.rhs - one);
 }
 
+#if __CUDA_ARCH__ >= 530
 UNARY_OP(__half, pow_fwd_f16, pow_bwd_f16, PowFKernelOp<__half>,
     powg(x, op.rhs),
     pow_bwd(op, x))
+#endif
 
 UNARY_OP(float, pow_fwd_f32, pow_bwd_f32, PowFKernelOp<float>,
     powg(x, op.rhs),

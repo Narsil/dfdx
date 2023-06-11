@@ -14,9 +14,11 @@ __device__ __forceinline__ T sigmoid_bwd(T y) {
     return y * (one - y);
 }
 
+#if __CUDA_ARCH__ >= 530
 UNARY_OP(__half, sigmoid_fwd_f16, sigmoid_bwd_f16, SigmoidKernelOp,
         sigmoid_fwd(x),
         sigmoid_bwd(y))
+#endif
 
 UNARY_OP(float, sigmoid_fwd_f32, sigmoid_bwd_f32, SigmoidKernelOp,
         sigmoid_fwd(x),

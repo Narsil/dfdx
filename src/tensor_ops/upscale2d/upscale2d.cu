@@ -165,6 +165,7 @@ extern "C" __global__ void bwd( \
     bwd_FN(op, inp_strides, grad_inp, grad_out); \
 }
 
+#if __CUDA_ARCH__ >= 530
 UPSCALE_OP(
     __half,
     nearest_upscale2d_fwd_f16, nearest_upscale2d_bwd_f16,
@@ -175,6 +176,7 @@ UPSCALE_OP(
     bilinear_upscale2d_fwd_f16, bilinear_upscale2d_bwd_f16,
     bilinear_upscale2d_fwd, bilinear_upscale2d_bwd
 );
+#endif
 
 UPSCALE_OP(
     float,

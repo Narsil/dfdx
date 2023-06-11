@@ -2,9 +2,11 @@
 
 struct SinKernelOp {};
 
+#if __CUDA_ARCH__ >= 530
 UNARY_OP(__half, sin_fwd_f16, sin_bwd_f16, SinKernelOp,
         sing(x),
         cosg(x))
+#endif
 
 UNARY_OP(float, sin_fwd_f32, sin_bwd_f32, SinKernelOp,
         sing(x),

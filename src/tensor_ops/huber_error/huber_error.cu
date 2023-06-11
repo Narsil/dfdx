@@ -34,11 +34,13 @@ __device__ T op_dfdy(HuberErrorOp<T> op, T x, T y) {
     return -op_dfdx(op, x, y);
 }
 
+#if __CUDA_ARCH__ >= 530
 BINARY_OP(__half, huber_fwd_f16, huber_bwd_lhs_f16, huber_bwd_rhs_f16, HuberErrorOp<__half>,
     op_f(op, x, y),
     op_dfdx(op, x, y),
     op_dfdy(op, x, y)
 )
+#endif
 
 BINARY_OP(float, huber_fwd_f32, huber_bwd_lhs_f32, huber_bwd_rhs_f32, HuberErrorOp<float>,
     op_f(op, x, y),

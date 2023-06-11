@@ -2,9 +2,11 @@
 
 struct AbsKernelOp {};
 
+#if __CUDA_ARCH__ >= 530
 UNARY_OP(__half, abs_fwd_f16, abs_bwd_f16, AbsKernelOp,
         absg(x),
         x == __float2half(0.0) ? __float2half(0.0) : copysigng(__float2half(1.0), x));
+#endif
 
 UNARY_OP(float, abs_fwd_f32, abs_bwd_f32, AbsKernelOp,
         absg(x),

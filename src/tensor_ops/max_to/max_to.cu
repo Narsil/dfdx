@@ -122,6 +122,8 @@ extern "C" __global__ void BWD( \
     max_to_bwd(numel, num_dims, elems_per_thread, info, inp, grad_inp, out, grad_out); \
 }
 
+#if __CUDA_ARCH__ >= 530
 MAX(__half, max_to_fwd_f16, max_to_bwd_f16);
+#endif
 MAX(float, max_to_fwd_f32, max_to_bwd_f32);
 MAX(double, max_to_fwd_f64, max_to_bwd_f64);

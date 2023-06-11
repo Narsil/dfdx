@@ -2,9 +2,11 @@
 
 struct SquareKernelOp {};
 
+#if __CUDA_ARCH__ >= 530
 UNARY_OP(__half, square_fwd_f16, square_bwd_f16, SquareKernelOp,
         x * x,
         x + x)
+#endif
 
 UNARY_OP(float, square_fwd_f32, square_bwd_f32, SquareKernelOp,
         x * x,

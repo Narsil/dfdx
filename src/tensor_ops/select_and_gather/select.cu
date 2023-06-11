@@ -109,6 +109,8 @@ extern "C" __global__ void BWD( \
     select_bwd(numel, grad_inp, inp_num_dims, inp_dims, inp_strides, idx, idx_num_dims, idx_dims, idx_strides, grad_out, out_dims, out_strides); \
 }
 
+#if __CUDA_ARCH__ >= 530
 SELECT(__half, select_fwd_f16, select_bwd_f16);
+#endif
 SELECT(float, select_fwd_f32, select_bwd_f32);
 SELECT(double, select_fwd_f64, select_bwd_f64)

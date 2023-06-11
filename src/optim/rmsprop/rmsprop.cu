@@ -91,6 +91,8 @@ extern "C" __global__ void FN( \
     rmsprop_update(cfg, numel, param, momentum, square_avg, grad_avg, grad); \
 }
 
+#if __CUDA_ARCH__ >= 530
 RMSPROP(__half, rmsprop_update_f16);
+#endif
 RMSPROP(float, rmsprop_update_f32);
 RMSPROP(double, rmsprop_update_f64);

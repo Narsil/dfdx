@@ -77,6 +77,8 @@ extern "C" __global__ void BWD( \
     sum_to_bwd(numel, num_dims, elems_per_thread, info, grad_inp, grad_out); \
 }
 
+#if __CUDA_ARCH__ >= 530
 SUM(__half, sum_to_fwd_f16, sum_to_bwd_f16);
+#endif
 SUM(float, sum_to_fwd_f32, sum_to_bwd_f32);
 SUM(double, sum_to_fwd_f64, sum_to_bwd_f64);

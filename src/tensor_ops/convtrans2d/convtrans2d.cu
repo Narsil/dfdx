@@ -192,6 +192,7 @@ extern "C" __global__ void SUM_TR_FILTERS( \
     sum_transposed_filters(op, filters_tr, filters, strides); \
 }
 
+#if __CUDA_ARCH__ >= 530
 CONV_OP(
     __half,
     unfold_input_into_patches_f16,
@@ -199,6 +200,7 @@ CONV_OP(
     transpose_filters_f16,
     sum_transposed_filters_f16
 );
+#endif
 CONV_OP(
     float,
     unfold_input_into_patches_f32,

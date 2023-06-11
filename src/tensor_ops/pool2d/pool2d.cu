@@ -183,6 +183,8 @@ extern "C" __global__ void bwd( \
     pool2d_bwd(op, inp_strides, out_strides, inp, grad_inp, out, grad_out); \
 }
 
+#if __CUDA_ARCH__ >= 530
 POOL_OP(__half, pool2d_fwd_f16, pool2d_bwd_f16);
+#endif
 POOL_OP(float, pool2d_fwd_f32, pool2d_bwd_f32);
 POOL_OP(double, pool2d_fwd_f64, pool2d_bwd_f64);

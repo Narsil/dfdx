@@ -2,9 +2,11 @@
 
 struct LnKernelOp {};
 
+#if __CUDA_ARCH__ >= 530
 UNARY_OP(__half, ln_fwd_f16, ln_bwd_f16, LnKernelOp,
         logg(x),
         recipg(x))
+#endif
 
 UNARY_OP(float, ln_fwd_f32, ln_bwd_f32, LnKernelOp,
         logg(x),

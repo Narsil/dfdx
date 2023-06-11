@@ -17,11 +17,13 @@ __device__ T op_dfdy(T x, T y) {
     return (x > y) ? 0.0 : ((x < y) ? 1.0 : 0.5);
 }
 
+#if __CUDA_ARCH__ >= 530
 BINARY_OP(__half, maximum_fwd_f16, maximum_bwd_lhs_f16, maximum_bwd_rhs_f16, MaximumKernalOp,
     op_f(x, y),
     op_dfdx(x, y),
     op_dfdy(x, y)
 )
+#endif
 
 BINARY_OP(float, maximum_fwd_f32, maximum_bwd_lhs_f32, maximum_bwd_rhs_f32, MaximumKernalOp,
     op_f(x, y),
